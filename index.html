@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Falcon S Authentication</title>
+    <link rel="icon" type="image/x-icon" href="FalconS.ico">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #121212;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: #1e1e1e;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .logo {
+            width: 100px;
+            margin-bottom: 15px;
+        }
+
+        h2 {
+            font-size: 22px;
+            color: #4facfe;
+            margin-bottom: 15px;
+        }
+
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 12px;
+            background: #4facfe;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .google-btn i {
+            margin-right: 8px;
+            font-size: 20px;
+        }
+
+        .google-btn:hover {
+            transform: scale(1.05);
+            background: #3c8ff6;
+        }
+
+        .error {
+            color: #ff4c4c;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <img src="convo.png" class="logo" alt="Falcon S Logo">
+        <h2>Sign In to Falcon S</h2>
+        <button class="google-btn" id="googleSignInBtn">
+            <i class="fab fa-google"></i> Continue with Google
+        </button>
+        <div class="error" id="error-message"></div>
+        <div class="footer">Powered by Falcon S</div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBcTEVvxXmv5N8dJav4xNDRy5hXZRjVeM4",
+            authDomain: "chatflow-59776.firebaseapp.com",
+            projectId: "chatflow-59776",
+            storageBucket: "chatflow-59776.appspot.com",
+            messagingSenderId: "549003131640",
+            appId: "1:549003131640:web:3f4a7b8cef4c0d8a2b990d",
+            measurementId: "G-V2180PR5CR"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Handle Google Sign-In
+        document.getElementById("googleSignInBtn").addEventListener("click", function() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithRedirect(provider);
+        });
+
+        // Handle Redirect Result
+        auth.getRedirectResult().then((result) => {
+            if (result.user) {
+                const userEmail = result.user.email;
+                checkUserInDatabase(userEmail);
+            }
+        }).catch((error) => {
+            document.getElementById("error-message").textContent = "Error: " + error.message;
+        });
+
+        // Check if User Exists in Firestore
+        function checkUserInDatabase(email) {
+            db.collection("users").where("email", "==", email).get()
+                .then((querySnapshot) => {
+                    if (!querySnapshot.empty) {
+                        // If user exists, redirect back to Electron app
+                        window.location.href = 'falcons://auth-success';
+                    } else {
+                        // If user does not exist, show error message
+                        document.getElementById("error-message").textContent = "Error: This email is not registered.";
+                    }
+                })
+                .catch(error => {
+                    document.getElementById("error-message").textContent = "Error: " + error.message;
+                });
+        }
+    </script>
+
+</body>
+</html>
