@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In</title>
+    <link rel="icon" type="image/x-icon" href="FalconS.ico">
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBcTEVvxXmv5N8dJav4xNDRy5hXZRjVeM4",
+            authDomain: "chatflow-59776.firebaseapp.com",
+            projectId: "chatflow-59776",
+            storageBucket: "chatflow-59776.appspot.com",
+            messagingSenderId: "549003131640",
+            appId: "1:549003131640:web:3f4a7b8cef4c0d8a2b990d",
+            measurementId: "G-V2180PR5CR"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Google Sign-In function
+        function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            firebase.auth().signInWithPopup(provider)
+                .then((result) => {
+                    return result.user.getIdToken(); // Get the Firebase ID token
+                })
+                .then((token) => {
+                    // Redirect to Electron app with the token
+                    window.location.href = "myapp://auth?token=" + token;
+                })
+                .catch((error) => {
+                    console.error("Error signing in:", error);
+                    document.getElementById("error-message").textContent = "Error: " + error.message;
+                });
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        #googleSignInBtn {
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #error-message {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Sign in to FalconS</h2>
+    <button id="googleSignInBtn" onclick="signInWithGoogle()">Sign in with Google</button>
+    <p id="error-message"></p>
+</body>
+</html>
