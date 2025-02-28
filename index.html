@@ -115,22 +115,19 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Handle Google Sign-In
+        // Handle Google Sign-In with Popup
         document.getElementById("googleSignInBtn").addEventListener("click", function() {
             const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithRedirect(provider);
+            
+            auth.signInWithPopup(provider).then((result) => {
+                if (result.user) {
+                    const userEmail = result.user.email;
+                    checkUserInDatabase(userEmail);
+                }
+            }).catch((error) => {
+                document.getElementById("error-message").textContent = "Error: " + error.message;
+            });
         });
-
-        // Handle Redirect Result
-        auth.getRedirectResult().then((result) => {
-            if (result.user) {
-                const userEmail = result.user.email;
-                checkUserInDatabase(userEmail);
-            }
-        }).catch((error) => {
-            document.getElementById("error-message").textContent = "Error: " + error.message;
-        });
-
         // Check if User Exists in Firestore
         function checkUserInDatabase(email) {
             db.collection("users").where("email", "==", email).get()
