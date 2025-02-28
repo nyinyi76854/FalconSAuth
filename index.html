@@ -128,6 +128,7 @@
                 document.getElementById("error-message").textContent = "Error: " + error.message;
             });
         });
+
         // Check if User Exists in Firestore
         function checkUserInDatabase(email) {
             db.collection("users").where("email", "==", email).get()
